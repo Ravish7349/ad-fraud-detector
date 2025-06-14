@@ -10,7 +10,6 @@ let hoverTimers = {};
 let hoverDurations = {};
 let sessionStart = Date.now();
 
-// ✅ New ad metrics
 let adHoverStart = null;
 let adHoverTime = 0;
 let adVisibleTime = 0;
@@ -21,13 +20,37 @@ let adClickAccuracy = null;
 let scrollToAdTime = null;
 let adSeenAt = null;
 
-// 📌 Mouse movement tracking
+function showToast(message) {
+    const toast = document.createElement("div");
+    toast.className = "toast show";
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.classList.remove("show");
+        document.body.removeChild(toast);
+    }, 2500);
+}
+
+function cycleAdMessage() {
+    const overlay = document.createElement("div");
+    overlay.id = "ad_overlay";
+    overlay.innerText = "This is an ad banner!";
+    const ad = document.getElementById("ad_banner");
+    ad.appendChild(overlay);
+    setTimeout(() => {
+        if (overlay && overlay.parentNode) overlay.remove();
+    }, 1800);
+}
+
+setInterval(cycleAdMessage, 4000);
+
+// Mouse movement tracking
 document.addEventListener("mousemove", (e) => {
     const time = performance.now() - clickStartTime;
     mousePath.push([e.clientX, e.clientY, time.toFixed(2)]);
 });
 
-// 📌 Scroll tracking
+// Scroll tracking
 let maxScrollY = 0;
 window.addEventListener("scroll", () => {
     maxScrollY = Math.max(maxScrollY, window.scrollY);
@@ -37,11 +60,12 @@ window.addEventListener("scroll", () => {
         if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
             scrollToAdTime = ((Date.now() - sessionStart) / 1000).toFixed(2);
             adSeenAt = Date.now();
+            showToast("📜 You scrolled - noted!");
         }
     }
 });
 
-// 📌 Ad hover tracking
+// Ad hover tracking
 const adBanner = document.getElementById("ad_banner");
 adBanner.addEventListener("mouseenter", () => {
     adHoverStart = Date.now();
@@ -53,7 +77,7 @@ adBanner.addEventListener("mouseleave", () => {
     }
 });
 
-// 📌 Visibility tracking with IntersectionObserver
+// Visibility tracking with IntersectionObserver
 const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
         const ts = Date.now();
@@ -64,7 +88,7 @@ const observer = new IntersectionObserver(entries => {
                 if (!entry.isIntersecting || entry.intersectionRatio < 1.0) {
                     clearInterval(visibleInterval);
                 } else {
-                    adVisibleTime += 0.1; // granularity ~100ms
+                    adVisibleTime += 0.1;
                 }
             }, 100);
         }
@@ -72,7 +96,7 @@ const observer = new IntersectionObserver(entries => {
 }, { threshold: [0, 0.25, 0.5, 0.75, 1.0] });
 observer.observe(adBanner);
 
-// 📌 Click tracking
+// Click tracking
 const adImage = document.getElementById("ad_image");
 document.addEventListener("click", (e) => {
     totalClicks++;
@@ -83,22 +107,22 @@ document.addEventListener("click", (e) => {
         window.clickDelay = delay.toFixed(2);
     }
 
+    showToast("🖱️ You clicked - logged!");
+
     if (e.target.closest("#ad_banner")) {
         adClicks++;
         repeatedAdClicks++;
+        showToast("🟨 Ad banner clicked - thanks!");
 
-        // Dwell time: hover → click
         if (adSeenAt) {
             adDwellTime = ((Date.now() - adSeenAt) / 1000).toFixed(2);
         }
 
-        // Click coordinates
         const adRect = adImage.getBoundingClientRect();
         const clickX = e.clientX;
         const clickY = e.clientY;
         adClickCoordinates.push({ x: clickX, y: clickY });
 
-        // Accuracy: distance from center
         const centerX = adRect.left + adRect.width / 2;
         const centerY = adRect.top + adRect.height / 2;
         const dx = clickX - centerX;
@@ -107,12 +131,10 @@ document.addEventListener("click", (e) => {
     }
 });
 
-// 📌 Hover duration for all trackable elements
 const trackHover = (element) => {
     element.addEventListener("mouseenter", () => {
         hoverTimers[element.id] = Date.now();
     });
-
     element.addEventListener("mouseleave", () => {
         if (hoverTimers[element.id]) {
             const duration = (Date.now() - hoverTimers[element.id]) / 1000;
@@ -142,7 +164,6 @@ function getFingerprint() {
     };
 }
 
-// 📌 Final Payload
 window.addEventListener("beforeunload", async () => {
     const payload = {
         session_id: crypto.randomUUID(),

@@ -20,10 +20,11 @@
     </header>
 
     <main>
+        <!-- ✅ Ad Banner with Overlay Label -->
         <div class="banner" id="ad_banner">
             <img id="ad_image" src="{{ url_for('static', filename='images/ad1.png') }}" alt="Ad Banner" loading="lazy" />
+            <div id="ad_overlay" class="ad-label">👆 This is an Ad Banner</div>
         </div>
-
 
         <!-- Categories -->
         <div class="categories">
@@ -59,5 +60,8 @@
             {% endfor %}
         </div>
     </main>
+
+    <!-- ✅ Toast Notification Message -->
+    <div id="toast" class="toast hidden"></div>
 </body>
 </html>
