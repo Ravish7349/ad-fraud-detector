@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Amazon Store</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='tracker.js') }}" defer></script>
+</head>
+<body>
+    <header>
+        <div class="nav">
+            <img src="{{ url_for('static', filename='images/lo1.png') }}" alt="Logo" class="logo">
+            <input type="text" placeholder="Search products...">
+            <div class="nav-links">
+                <span>Account</span>
+                <span>Orders</span>
+                <span>Cart</span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Banner -->
+        <div class="banner" id="ad_banner">
+            <img src="{{ url_for('static', filename='images/ad1.png') }}" alt="Ad Banner" loading="lazy">
+        </div>
+
+        <!-- Categories -->
+        <div class="categories">
+            <div class="category">
+                <h3>Electronics</h3>
+                <img src="{{ url_for('static', filename='images/TV1.jpg') }}" alt="TV" loading="lazy">
+                <p>Smart TVs, Cameras, Speakers</p>
+            </div>
+            <div class="category">
+                <h3>Home Appliances</h3>
+                <img src="{{ url_for('static', filename='images/HA1.jpg') }}" alt="Appliance" loading="lazy">
+                <p>Microwaves, Fridges, Washing Machines</p>
+            </div>
+            <div class="category">
+                <h3>Fashion</h3>
+                <img src="{{ url_for('static', filename='images/fa1.jpg') }}" alt="Clothes" loading="lazy">
+                <p>Men’s & Women’s Clothing</p>
+            </div>
+            <div class="category">
+                <h3>Mobiles</h3>
+                <img src="{{ url_for('static', filename='images/Mo1.jpg') }}" alt="Mobile" loading="lazy">
+                <p>Smartphones, Accessories</p>
+            </div>
+        </div>
+
+        <!-- Products -->
+        <div class="products">
+            {% for i in range(1, 9) %}
+            <div class="product" id="product_{{ i }}">
+                <img src="{{ url_for('static', filename='images/product' ~ i ~ '.jpg') }}" alt="Product {{ i }}" loading="lazy">
+                <p>Product {{ i }} - ₹{{ 499 + i * 100 }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+</body>
+</html>

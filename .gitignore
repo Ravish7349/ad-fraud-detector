@@ -1,0 +1,17 @@
+# Byte-compiled / cache
+__pycache__/
+*.pyc
+
+# Environment files
+.env
+
+# VS Code / IDE settings (optional)
+.vscode/
+.idea/
+
+# DB or log files (if any)
+*.sqlite3
+*.log
+
+# System files
+.DS_Store
