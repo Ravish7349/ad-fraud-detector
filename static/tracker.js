@@ -78,7 +78,7 @@ window.addEventListener("beforeunload", async () => {
     const payload = {
         session_id: crypto.randomUUID(),
         label: "human",
-        timestamp: new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }),
+        timestamp: new Date().toISOString(),
         mouse_path: mousePath,
         scroll_depth: maxScrollY,
         click_delay: window.clickDelay || null,

@@ -6,6 +6,8 @@ from datetime import datetime
 import os
 import sys
 import traceback
+from pytz import timezone, UTC
+
 
 # Set correct paths for production and local
 app = Flask(
@@ -26,12 +28,13 @@ def log_session():
         session_id = data.get("session_id")
         label = data.get("label", "unknown")
         timestamp_str = data.get("timestamp")
-
-        # Parse timestamp to a proper format
         try:
-            timestamp = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
-        except ValueError:
-            timestamp = datetime.now()
+            naive_time = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
+            ist = timezone("Asia/Kolkata")
+            timestamp = ist.localize(naive_time)
+        except Exception:
+            timestamp = datetime.now(timezone("Asia/Kolkata"))
+
 
         mouse_path = json.dumps(data.get("mouse_path"))
         scroll_depth = int(data.get("scroll_depth") or 0)
