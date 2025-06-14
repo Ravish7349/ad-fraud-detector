@@ -1,4 +1,3 @@
-# backend/app.py
 from flask import Flask, render_template, request
 from db import get_connection
 import json
@@ -6,8 +5,8 @@ from datetime import datetime
 import os
 import sys
 import traceback
-from pytz import timezone, UTC
-
+from pytz import timezone
+from dateutil import parser
 
 # Set correct paths for production and local
 app = Flask(
@@ -28,10 +27,12 @@ def log_session():
         session_id = data.get("session_id")
         label = data.get("label", "unknown")
         timestamp_str = data.get("timestamp")
+
+        # ✅ Parse ISO format with time zone and convert to IST
         try:
-            naive_time = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
+            utc_time = parser.isoparse(timestamp_str)
             ist = timezone("Asia/Kolkata")
-            timestamp = ist.localize(naive_time)
+            timestamp = utc_time.astimezone(ist)
         except Exception:
             timestamp = datetime.now(timezone("Asia/Kolkata"))
 
