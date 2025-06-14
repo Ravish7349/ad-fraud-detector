@@ -4,6 +4,8 @@ from db import get_connection
 import json
 from datetime import datetime
 import os
+import sys
+import traceback
 
 # Set correct paths for production and local
 app = Flask(
@@ -60,8 +62,10 @@ def log_session():
         return "Session logged successfully", 200
 
     except Exception as e:
-        print(f"[ERROR] Failed to log session: {e}")
-        return "Internal Server Error", 500
+        print("[ERROR]", e, file=sys.stderr)
+        traceback.print_exc(file=sys.stderr)  # This prints the full traceback
+        return "Error logging session", 500
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
