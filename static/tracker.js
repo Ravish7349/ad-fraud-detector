@@ -9,36 +9,34 @@ let hoverTimers = {};
 let hoverDurations = {};
 let sessionStart = Date.now();
 
-// Capture mouse path with timestamp
+// 📌 Mouse movement tracking
 document.addEventListener("mousemove", (e) => {
     const time = performance.now() - clickStartTime;
     mousePath.push([e.clientX, e.clientY, time.toFixed(2)]);
 });
 
-// Track max scroll depth
+// 📌 Scroll tracking
 let maxScrollY = 0;
 window.addEventListener("scroll", () => {
     maxScrollY = Math.max(maxScrollY, window.scrollY);
 });
 
-// Click tracking
+// 📌 Click tracking
 document.addEventListener("click", (e) => {
     totalClicks++;
     clickPositions.push([e.clientX, e.clientY]);
 
-    // Delay from page load to first click
     if (!window.clickDelay) {
         const delay = (performance.now() - clickStartTime) / 1000;
         window.clickDelay = delay.toFixed(2);
     }
 
-    // Track if ad banner was clicked
     if (e.target.closest("#ad_banner")) {
         adClicks++;
     }
 });
 
-// Hover time tracking
+// 📌 Hover duration tracking
 const trackHover = (element) => {
     element.addEventListener("mouseenter", () => {
         hoverTimers[element.id] = Date.now();
@@ -53,12 +51,12 @@ const trackHover = (element) => {
     });
 };
 
-// Attach hover listeners
+// 📌 Attach hover tracking to products, categories, and ad
 window.addEventListener("load", () => {
     document.querySelectorAll(".product, .category, #ad_banner").forEach(trackHover);
 });
 
-// Extract fingerprint features
+// 📌 Device fingerprinting
 function getFingerprint() {
     let canvas = document.createElement("canvas");
     let gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
@@ -75,8 +73,8 @@ function getFingerprint() {
     };
 }
 
-// Send session data before leaving
-window.addEventListener("beforeunload", () => {
+// 📌 Send data using fetch() before user leaves
+window.addEventListener("beforeunload", async () => {
     const payload = {
         session_id: crypto.randomUUID(),
         label: "human",
@@ -92,5 +90,16 @@ window.addEventListener("beforeunload", () => {
         fingerprint: getFingerprint()
     };
 
-    navigator.sendBeacon("/log_session", JSON.stringify(payload));
+    try {
+        await fetch("/log_session", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload),
+            keepalive: true // 🔐 Ensures delivery on unload
+        });
+    } catch (error) {
+        console.error("Session logging failed:", error);
+    }
 });

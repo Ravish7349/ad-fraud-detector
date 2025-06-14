@@ -17,7 +17,6 @@ def get_connection():
 def init_db():
     conn = get_connection()
     cursor = conn.cursor()
-
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS sessions (
             session_id TEXT PRIMARY KEY,
@@ -28,12 +27,12 @@ def init_db():
             click_delay FLOAT,
             click_positions JSONB,
             total_clicks INTEGER,
+            ad_clicks INTEGER,
             hover_times JSONB,
             session_duration FLOAT,
             fingerprint JSONB
         );
     """)
-
     conn.commit()
     cursor.close()
     conn.close()
