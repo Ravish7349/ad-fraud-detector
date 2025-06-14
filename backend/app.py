@@ -20,6 +20,9 @@ app = Flask(
 def index():
     return render_template('index.html')
 
+from pytz import timezone
+from dateutil import parser
+
 @app.route('/log_session', methods=['POST'])
 def log_session():
     try:
@@ -29,15 +32,10 @@ def log_session():
         label = data.get("label", "unknown")
         timestamp_str = data.get("timestamp")
 
-        # ✅ Parse ISO format with time zone and convert to IST
-        # ✅ Parse IST timestamp from frontend string (e.g., "2025-06-14 16:30:58")
-        try:
-            ist = timezone("Asia/Kolkata")
-            timestamp = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
-            timestamp = ist.localize(timestamp)
-        except Exception:
-            timestamp = datetime.now(timezone("Asia/Kolkata"))
-
+        # Convert ISO timestamp to IST
+        utc_time = parser.isoparse(timestamp_str)  # assuming frontend sends UTC
+        ist = timezone("Asia/Kolkata")
+        timestamp = utc_time.astimezone(ist)
         mouse_path = json.dumps(data.get("mouse_path"))
         scroll_depth = int(data.get("scroll_depth") or 0)
         click_delay = float(data.get("click_delay") or 0)
