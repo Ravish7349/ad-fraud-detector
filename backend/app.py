@@ -8,6 +8,7 @@ import traceback
 from pytz import timezone
 from dateutil import parser
 
+
 # Set correct paths for production and local
 app = Flask(
     __name__,
@@ -29,13 +30,13 @@ def log_session():
         timestamp_str = data.get("timestamp")
 
         # ✅ Parse ISO format with time zone and convert to IST
+        # ✅ Parse IST timestamp from frontend string (e.g., "2025-06-14 16:30:58")
         try:
-            utc_time = parser.isoparse(timestamp_str)
             ist = timezone("Asia/Kolkata")
-            timestamp = utc_time.astimezone(ist)
+            timestamp = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
+            timestamp = ist.localize(timestamp)
         except Exception:
             timestamp = datetime.now(timezone("Asia/Kolkata"))
-
 
         mouse_path = json.dumps(data.get("mouse_path"))
         scroll_depth = int(data.get("scroll_depth") or 0)
